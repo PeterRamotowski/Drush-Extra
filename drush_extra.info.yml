@@ -1,0 +1,5 @@
+name: Drush Extra
+type: module
+description: Provides additional Drush commands adapted from Drupal Console
+package: Drush
+core_version_requirement: ^9 || ^10

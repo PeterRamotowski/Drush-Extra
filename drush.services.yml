@@ -1,0 +1,16 @@
+services:
+  drush_extra.entity_debug:
+    class: \Drupal\drush_extra\Commands\Debug\EntityCommand
+    arguments: ['@entity_type.repository', '@entity_type.bundle.info']
+    tags:
+      - { name: drush.command }
+  drush_extra.roles_debug:
+    class: \Drupal\drush_extra\Commands\Debug\RolesCommand
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: drush.command }
+  drush_extra.cron_release:
+    class: \Drupal\drush_extra\Commands\Cron\ReleaseCommand
+    arguments: ['@lock']
+    tags:
+      - { name: drush.command }
