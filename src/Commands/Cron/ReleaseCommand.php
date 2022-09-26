@@ -32,7 +32,7 @@ class ReleaseCommand extends DrushCommands
 	/**
 	 * Release cron system lock to run cron again
 	 * 
-	 * @command cron:release
+	 * @command core:cron:release
 	 * @aliases cror
 	 * 
 	 * @usage cron:release
