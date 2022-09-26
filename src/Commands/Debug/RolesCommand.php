@@ -3,11 +3,14 @@
 namespace Drupal\drush_extra\Commands\Debug;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\user\RoleInterface;
 use Drush\Commands\DrushCommands;
 
 class RolesCommand extends DrushCommands
 {
+	use StringTranslationTrait;
+
 	/**
 	 * @var EntityTypeManagerInterface
 	 */
@@ -26,29 +29,29 @@ class RolesCommand extends DrushCommands
 	}
 
 	/**
-   * Displays all roles with optional permissions
+	 * Displays all roles with optional permissions
 	 * 
-   * @param string $withPermissions
+	 * @param string $withPermissions
 	 * 	Include permissions (optional)
 	 * 
-   * @command debug:roles
-   * @aliases debr,dusr
+	 * @command debug:roles
+	 * @aliases debr,dusr
 	 * 
-   * @usage debug:roles
-   * @usage debug:roles permissions
-   */
-  public function roles($withPermissions = null)
+	 * @usage debug:roles
+	 * @usage debug:roles permissions
+	 */
+	public function roles($withPermissions = null)
 	{
 		$roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
 		ksort($roles);
 
 		$tableHeader = [
-			'Role ID',
-			'Role label'
+			$this->t('Role ID'),
+			$this->t('Role label')
 		];
 
 		if ($withPermissions) {
-			$tableHeader[] = 'Permissions';
+			$tableHeader[] = $this->t('Permissions');
 		}
 
 		$tableRows = [];

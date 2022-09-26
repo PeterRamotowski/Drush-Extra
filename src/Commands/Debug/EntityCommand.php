@@ -4,10 +4,13 @@ namespace Drupal\drush_extra\Commands\Debug;
 
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drush\Commands\DrushCommands;
 
 class EntityCommand extends DrushCommands
 {
+	use StringTranslationTrait;
+
 	/**
 	 * @var EntityTypeRepositoryInterface
 	 */
@@ -34,25 +37,25 @@ class EntityCommand extends DrushCommands
 	}
 
 	/**
-   * Displays all entities and bundles
-   *
-   * @param string $paramEntityGroup
+	 * Displays all entities and bundles
+	 *
+	 * @param string $paramEntityGroup
 	 * 	Entity group, e.g. Content (optional)
 	 * 
-   * @command debug:entity
-   * @aliases debe
+	 * @command debug:entity
+	 * @aliases debe
 	 * 
-   * @usage debug:entity
-   * @usage debug:entity Content
-   */
-  public function entity($paramEntityGroup = null)
+	 * @usage debug:entity
+	 * @usage debug:entity Content
+	 */
+	public function entity($paramEntityGroup = null)
 	{
 		$tableHeader = [
-			'Entity class ID',
-			'Entity ID',
-			'Entity label',
-			'Bundle',
-			'Entity group'
+			$this->t('Entity class ID'),
+			$this->t('Entity ID'),
+			$this->t('Entity label'),
+			$this->t('Bundle'),
+			$this->t('Entity group')
 		];
 		$tableRows = [];
 
@@ -82,7 +85,7 @@ class EntityCommand extends DrushCommands
 				];
 
 				$entityBundles = $this->entityTypeBundle->getBundleInfo($entityId);
-				
+
 				foreach ($entityBundles as $bundleId => $bundle) {
 					$tableRows[$bundleId] = [
 						$entityId,

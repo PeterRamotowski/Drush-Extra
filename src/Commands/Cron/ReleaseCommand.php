@@ -3,12 +3,15 @@
 namespace Drupal\drush_extra\Commands\Cron;
 
 use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drush\Commands\DrushCommands;
 use Drush\Drush;
 use Symfony\Component\Config\Definition\Exception\Exception;
 
 class ReleaseCommand extends DrushCommands
 {
+	use StringTranslationTrait;
+
 	/**
 	 * @var LockBackendInterface
 	 */
@@ -39,7 +42,7 @@ class ReleaseCommand extends DrushCommands
 		try {
 			$this->lock->release('cron');
 
-			$this->io()->text('Cron lock was released successfully');
+			$this->io()->text($this->t('Cron lock was released successfully'));
 		}
 		catch (Exception $e) {
 			$this->io()->error($e->getMessage());
