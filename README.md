@@ -2,32 +2,12 @@
 
 Provides additional Drush commands adapted from Drupal Console
 
-## Usage
+## Commands list
 
-Displays all entities and bundles:
-
-```bash
-drush debug:entity
-```
-
-Displays all roles with optional permissions:
-
-```bash
-drush debug:roles
-```
-or
-
-```bash
-drush debug:roles permissions
-```
-
-Release cron system lock to run cron again
-
-```bash
-drush cron:release
-```
-
-## Todo
-
-1. Add translation support
-2. Much more commands :)
+| Description | Usage | Alias |
+| --- | --- | --- |
+| Release cron system lock to run cron again | ``` drush core:cron:release ```| ``` drush cror ``` |
+| Displays all entities and bundles | ``` drush debug:entity ``` | ``` drush debe ``` |
+| Displays all images styles with effects | ``` drush debug:image:styles ```| ``` drush debis ``` |
+| Displays all roles with optional permissions | ``` drush debug:roles ``` | ``` drush debr ``` |
+| | ``` drush debug:roles permissions ```|  |
