@@ -11,3 +11,5 @@ Provides additional Drush commands adapted from Drupal Console
 | Displays all images styles with effects | ``` drush debug:image:styles ```| ``` drush debis ``` |
 | Displays all roles with optional permissions | ``` drush debug:roles ``` | ``` drush debr ``` |
 | | ``` drush debug:roles permissions ```|  |
+| Rebuild node access permissions | ``` drush node:access:rebuild ``` | ``` drush nar ``` |
+| | ``` drush node:access:rebuild batch ```|  |

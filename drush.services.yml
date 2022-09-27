@@ -19,3 +19,8 @@ services:
     arguments: ['@lock']
     tags:
       - { name: drush.command }
+  drush_extra.node_access_rebuild:
+    class: \Drupal\drush_extra\Commands\Node\AccessRebuildCommand
+    arguments: ['@state']
+    tags:
+      - { name: drush.command }
