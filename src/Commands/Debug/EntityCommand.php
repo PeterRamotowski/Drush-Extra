@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\drush_extra\Helpers\CommandHelper;
+use Drupal\drush_extra\Helpers\TableHelper;
 use Drush\Commands\DrushCommands;
 
 class EntityCommand extends DrushCommands
@@ -28,19 +29,28 @@ class EntityCommand extends DrushCommands
 	protected $commandHelper;
 
 	/**
+	 * @var TableHelper
+	 */
+	protected $tableHelper;
+
+	/**
 	 * EntityCommand constructor.
 	 *
 	 * @param EntityTypeRepositoryInterface $entityTypeRepository
 	 * @param EntityTypeBundleInfoInterface $entityTypeBundle
 	 * @param CommandHelper $commandHelper
+	 * @param TableHelper $tableHelper
 	 */
 	public function __construct(
 		EntityTypeRepositoryInterface $entityTypeRepository,
+		EntityTypeBundleInfoInterface $entityTypeBundle,
 		CommandHelper $commandHelper,
+		TableHelper $tableHelper
 	) {
 		$this->entityTypeRepository = $entityTypeRepository;
 		$this->entityTypeBundle = $entityTypeBundle;
 		$this->commandHelper = $commandHelper;
+		$this->outputTable = $tableHelper;
 		parent::__construct();
 	}
 
@@ -63,13 +73,14 @@ class EntityCommand extends DrushCommands
 		);
 
 		$this->io()->text($commandDescription);
+
+		$this->outputTable->addHeaderRow([
 			$this->t('Entity class ID'),
 			$this->t('Entity ID'),
 			$this->t('Entity label'),
 			$this->t('Bundle'),
 			$this->t('Entity group')
-		];
-		$tableRows = [];
+		]);
 
 		$entityTypes = $this->entityTypeRepository->getEntityTypeLabels(true);
 
@@ -88,28 +99,31 @@ class EntityCommand extends DrushCommands
 			$entities = $entityTypes[$entityGroup];
 
 			foreach ($entities as $entityId => $entityType) {
-				$tableRows[$entityId] = [
+				$this->outputTable->addRow([
 					$entityId,
 					$entityId,
 					$entityType->render(),
 					'',
 					$entityGroup
-				];
+				], $entityId);
 
 				$entityBundles = $this->entityTypeBundle->getBundleInfo($entityId);
 
 				foreach ($entityBundles as $bundleId => $bundle) {
-					$tableRows[$bundleId] = [
+					$this->outputTable->addRow([
 						$entityId,
 						$bundleId,
 						$bundle['label'],
 						'yes',
 						$entityGroup
-					];
+					], $bundleId);
 				}
 			}
 		}
 
-		$this->io()->table($tableHeader, array_values($tableRows));
+		$this->io()->table(
+			$this->outputTable->getHeaderRows(),
+			$this->outputTable->getRows()
+		);
 	}
 }

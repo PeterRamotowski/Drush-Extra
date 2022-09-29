@@ -5,6 +5,7 @@ namespace Drupal\drush_extra\Commands\Debug;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\drush_extra\Helpers\CommandHelper;
+use Drupal\drush_extra\Helpers\TableHelper;
 use Drupal\user\RoleInterface;
 use Drush\Commands\DrushCommands;
 
@@ -23,16 +24,25 @@ class RolesCommand extends DrushCommands
 	protected $commandHelper;
 
 	/**
+	 * @var TableHelper
+	 */
+	protected $tableHelper;
+
+	/**
 	 * RolesCommand constructor.
 	 *
 	 * @param EntityTypeManagerInterface $entityTypeManager
 	 * @param CommandHelper $commandHelper
+	 * @param TableHelper $tableHelper
 	 */
 	public function __construct(
+		EntityTypeManagerInterface $entityTypeManager,
 		CommandHelper $commandHelper,
+		TableHelper $tableHelper
 	) {
 		$this->entityTypeManager = $entityTypeManager;
 		$this->commandHelper = $commandHelper;
+		$this->outputTable = $tableHelper;
 		parent::__construct();
 	}
 
@@ -59,29 +69,27 @@ class RolesCommand extends DrushCommands
 		$roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
 		ksort($roles);
 
-		$tableHeader = [
-			$this->t('Role ID'),
-			$this->t('Role label')
-		];
+		$this->outputTable->addHeaderRow([$this->t('Role ID'), $this->t('Role label')]);
 
 		if ($withPermissions) {
-			$tableHeader[] = $this->t('Permissions');
+			$this->outputTable->addHeaderRowColumn($this->t('Permissions'));
 		}
-
-		$tableRows = [];
 
 		/** @var RoleInterface $role */
 		foreach ($roles as $roleId => $role) {
-			$tableRows[$roleId] = [
-				$roleId,
-				$role->label()
-			];
+			$this->outputTable->addRow([$roleId, $role->label()], $roleId);
 
 			if ($withPermissions) {
-				$tableRows[$roleId][] = implode("\n", $role->getPermissions());
+				$this->outputTable->addRowColumn(
+					implode("\n", $role->getPermissions()),
+					$roleId
+				);
 			}
 		}
 
-		$this->io()->table($tableHeader, $tableRows);
+		$this->io()->table(
+			$this->outputTable->getHeaderRows(),
+			$this->outputTable->getRows()
+		);
 	}
 }

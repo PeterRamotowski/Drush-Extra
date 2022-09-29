@@ -5,6 +5,7 @@ namespace Drupal\drush_extra\Commands\Debug;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\drush_extra\Helpers\CommandHelper;
+use Drupal\drush_extra\Helpers\TableHelper;
 use Drupal\image\ImageEffectInterface;
 use Drupal\image\ImageEffectPluginCollection;
 use Drupal\image\ImageStyleInterface;
@@ -25,16 +26,25 @@ class ImageStylesCommand extends DrushCommands
 	protected $commandHelper;
 
 	/**
+	 * @var TableHelper
+	 */
+	protected $tableHelper;
+
+	/**
 	 * ImageStylesCommand constructor.
 	 *
 	 * @param EntityTypeManagerInterface $entityTypeManager
 	 * @param CommandHelper $commandHelper
+	 * @param TableHelper $tableHelper
 	 */
 	public function __construct(
+		EntityTypeManagerInterface $entityTypeManager,
 		CommandHelper $commandHelper,
+		TableHelper $tableHelper
 	) {
 		$this->entityTypeManager = $entityTypeManager;
 		$this->commandHelper = $commandHelper;
+		$this->outputTable = $tableHelper;
 		parent::__construct();
 	}
 
@@ -63,28 +73,27 @@ class ImageStylesCommand extends DrushCommands
 	 */
 	protected function imageStylesList(array $imageStyles)
 	{
-		$tableHeader = [
+		$this->outputTable->addHeaderRow([
 			$this->t('Machine Name'),
 			$this->t('Label'),
 			$this->t('Effects')
-		];
-
-		$tableRows = [];
+		]);
 
 		/** @var ImageStyleInterface $style */
 		foreach ($imageStyles as $styleId => $style) {
-			$tableRows[] = [
+			$this->outputTable->addRow([
 				$styleId,
 				$style->label(),
 				''
-			];
+			]);
 
-			$styleEffects = $this->styleEffectsList($style->getEffects());
-
-			$tableRows = array_merge($tableRows, $styleEffects);
+			$this->styleEffectsList($style->getEffects());
 		}
 
-		$this->io()->table($tableHeader, $tableRows);
+		$this->io()->table(
+			$this->outputTable->getHeaderRows(),
+			$this->outputTable->getRows()
+		);
 	}
 
 	/**
@@ -92,45 +101,33 @@ class ImageStylesCommand extends DrushCommands
 	 */
 	protected function styleEffectsList(ImageEffectPluginCollection $styleEffects)
 	{
-		$tableRows = [];
-
 		/** @var ImageEffectInterface $effect */
 		foreach ($styleEffects as $effect) {
 			$effectSummary = $effect->getSummary();
 
-			$tableRows[] = [
-				'',
-				'',
+			$this->outputTable->addRowWithOnlyLastColumn(
 				sprintf(
 					"%s / %s",
 					$effectSummary['#effect']['id'],
 					$effect->label(),
 				)
-			];
+			);
 
 			if (array_key_exists('#markup', $effectSummary)) {
 				$markup = $effectSummary['#markup'];
 
 				if (!empty($markup)) {
-					$tableRows[] = [
-						'',
-						'',
-						$markup
-					];
+					$this->outputTable->addRowWithOnlyLastColumn($markup);
 				}
 			}
 
 			if (array_key_exists('#data', $effectSummary)) {
-				$tableRows[] = [
-					'',
-					'',
+				$this->outputTable->addRowWithOnlyLastColumn(
 					json_encode($effectSummary['#data'])
-				];
+				);
 			}
 
-			$tableRows[] = ['', '', ''];
+			$this->outputTable->addEmptyRow();
 		}
-
-		return $tableRows;
 	}
 }
