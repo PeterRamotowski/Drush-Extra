@@ -4,6 +4,7 @@ namespace Drupal\drush_extra\Commands\Debug;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\drush_extra\Helpers\CommandHelper;
 use Drupal\image\ImageEffectInterface;
 use Drupal\image\ImageEffectPluginCollection;
 use Drupal\image\ImageStyleInterface;
@@ -19,14 +20,21 @@ class ImageStylesCommand extends DrushCommands
 	protected $entityTypeManager;
 
 	/**
+	 * @var CommandHelper
+	 */
+	protected $commandHelper;
+
+	/**
 	 * ImageStylesCommand constructor.
 	 *
 	 * @param EntityTypeManagerInterface $entityTypeManager
+	 * @param CommandHelper $commandHelper
 	 */
 	public function __construct(
-		EntityTypeManagerInterface $entityTypeManager
+		CommandHelper $commandHelper,
 	) {
 		$this->entityTypeManager = $entityTypeManager;
+		$this->commandHelper = $commandHelper;
 		parent::__construct();
 	}
 
@@ -40,6 +48,12 @@ class ImageStylesCommand extends DrushCommands
 	 */
 	public function styles()
 	{
+		$commandDescription = $this->commandHelper->getCommandDescription(
+			$this->commandData->annotationData()->get('command')
+		);
+
+		$this->io()->text($commandDescription);
+
 		$imageStyles = $this->entityTypeManager->getStorage('image_style')->loadMultiple();
 		$this->imageStylesList($imageStyles);
 	}

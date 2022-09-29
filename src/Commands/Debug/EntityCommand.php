@@ -5,6 +5,7 @@ namespace Drupal\drush_extra\Commands\Debug;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\drush_extra\Helpers\CommandHelper;
 use Drush\Commands\DrushCommands;
 
 class EntityCommand extends DrushCommands
@@ -22,17 +23,24 @@ class EntityCommand extends DrushCommands
 	protected $entityTypeBundle;
 
 	/**
+	 * @var CommandHelper
+	 */
+	protected $commandHelper;
+
+	/**
 	 * EntityCommand constructor.
 	 *
 	 * @param EntityTypeRepositoryInterface $entityTypeRepository
 	 * @param EntityTypeBundleInfoInterface $entityTypeBundle
+	 * @param CommandHelper $commandHelper
 	 */
 	public function __construct(
 		EntityTypeRepositoryInterface $entityTypeRepository,
-		EntityTypeBundleInfoInterface $entityTypeBundle
+		CommandHelper $commandHelper,
 	) {
 		$this->entityTypeRepository = $entityTypeRepository;
 		$this->entityTypeBundle = $entityTypeBundle;
+		$this->commandHelper = $commandHelper;
 		parent::__construct();
 	}
 
@@ -50,7 +58,11 @@ class EntityCommand extends DrushCommands
 	 */
 	public function entity($paramEntityGroup = null)
 	{
-		$tableHeader = [
+		$commandDescription = $this->commandHelper->getCommandDescription(
+			$this->commandData->annotationData()->get('command')
+		);
+
+		$this->io()->text($commandDescription);
 			$this->t('Entity class ID'),
 			$this->t('Entity ID'),
 			$this->t('Entity label'),

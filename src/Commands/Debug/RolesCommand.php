@@ -4,6 +4,7 @@ namespace Drupal\drush_extra\Commands\Debug;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\drush_extra\Helpers\CommandHelper;
 use Drupal\user\RoleInterface;
 use Drush\Commands\DrushCommands;
 
@@ -17,14 +18,21 @@ class RolesCommand extends DrushCommands
 	protected $entityTypeManager;
 
 	/**
+	 * @var CommandHelper
+	 */
+	protected $commandHelper;
+
+	/**
 	 * RolesCommand constructor.
 	 *
 	 * @param EntityTypeManagerInterface $entityTypeManager
+	 * @param CommandHelper $commandHelper
 	 */
 	public function __construct(
-		EntityTypeManagerInterface $entityTypeManager
+		CommandHelper $commandHelper,
 	) {
 		$this->entityTypeManager = $entityTypeManager;
+		$this->commandHelper = $commandHelper;
 		parent::__construct();
 	}
 
@@ -42,6 +50,12 @@ class RolesCommand extends DrushCommands
 	 */
 	public function roles($withPermissions = null)
 	{
+		$commandDescription = $this->commandHelper->getCommandDescription(
+			$this->commandData->annotationData()->get('command')
+		);
+
+		$this->io()->text($commandDescription);
+
 		$roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
 		ksort($roles);
 
