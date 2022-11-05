@@ -1,21 +1,19 @@
 services:
-  drush_extra.helper_command:
-    class: \Drupal\drush_extra\Helpers\CommandHelper
   drush_extra.helper_table:
     class: \Drupal\drush_extra\Helpers\TableHelper
   drush_extra.entity_debug:
     class: \Drupal\drush_extra\Commands\Debug\EntityCommand
-    arguments: ['@entity_type.repository', '@entity_type.bundle.info', '@drush_extra.helper_command', '@drush_extra.helper_table']
+    arguments: ['@entity_type.repository', '@entity_type.bundle.info', '@drush_extra.helper_table']
     tags:
       - { name: drush.command }
   drush_extra.roles_debug:
     class: \Drupal\drush_extra\Commands\Debug\RolesCommand
-    arguments: ['@entity_type.manager', '@drush_extra.helper_command', '@drush_extra.helper_table']
+    arguments: ['@entity_type.manager', '@drush_extra.helper_table']
     tags:
       - { name: drush.command }
   drush_extra.image_styles_debug:
     class: \Drupal\drush_extra\Commands\Debug\ImageStylesCommand
-    arguments: ['@entity_type.manager', '@drush_extra.helper_command', '@drush_extra.helper_table']
+    arguments: ['@entity_type.manager', '@drush_extra.helper_table']
     tags:
       - { name: drush.command }
   drush_extra.cron_release:

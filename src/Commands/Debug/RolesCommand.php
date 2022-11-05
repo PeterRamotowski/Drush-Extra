@@ -2,6 +2,7 @@
 
 namespace Drupal\drush_extra\Commands\Debug;
 
+use Consolidation\AnnotatedCommand\CommandData;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\drush_extra\Helpers\CommandHelper;
@@ -19,11 +20,6 @@ class RolesCommand extends DrushCommands
 	protected $entityTypeManager;
 
 	/**
-	 * @var CommandHelper
-	 */
-	protected $commandHelper;
-
-	/**
 	 * @var TableHelper
 	 */
 	protected $tableHelper;
@@ -32,16 +28,13 @@ class RolesCommand extends DrushCommands
 	 * RolesCommand constructor.
 	 *
 	 * @param EntityTypeManagerInterface $entityTypeManager
-	 * @param CommandHelper $commandHelper
 	 * @param TableHelper $tableHelper
 	 */
 	public function __construct(
 		EntityTypeManagerInterface $entityTypeManager,
-		CommandHelper $commandHelper,
 		TableHelper $tableHelper
 	) {
 		$this->entityTypeManager = $entityTypeManager;
-		$this->commandHelper = $commandHelper;
 		$this->outputTable = $tableHelper;
 		parent::__construct();
 	}
@@ -60,12 +53,6 @@ class RolesCommand extends DrushCommands
 	 */
 	public function roles($withPermissions = null)
 	{
-		$commandDescription = $this->commandHelper->getCommandDescription(
-			$this->commandData->annotationData()->get('command')
-		);
-
-		$this->io()->text($commandDescription);
-
 		$roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
 		ksort($roles);
 
@@ -91,5 +78,16 @@ class RolesCommand extends DrushCommands
 			$this->outputTable->getHeaderRows(),
 			$this->outputTable->getRows()
 		);
+	}
+
+	/**
+	 * @hook pre-command debug:roles
+	 */
+	public function preCommand(CommandData $commandData)
+	{
+		$commandHelper = new CommandHelper($commandData);
+		$commandDescription = $commandHelper->getCommandDescription();
+
+		$this->io()->text($commandDescription);
 	}
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\drush_extra\Commands\Debug;
 
+use Consolidation\AnnotatedCommand\CommandData;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -24,11 +25,6 @@ class EntityCommand extends DrushCommands
 	protected $entityTypeBundle;
 
 	/**
-	 * @var CommandHelper
-	 */
-	protected $commandHelper;
-
-	/**
 	 * @var TableHelper
 	 */
 	protected $tableHelper;
@@ -38,18 +34,15 @@ class EntityCommand extends DrushCommands
 	 *
 	 * @param EntityTypeRepositoryInterface $entityTypeRepository
 	 * @param EntityTypeBundleInfoInterface $entityTypeBundle
-	 * @param CommandHelper $commandHelper
 	 * @param TableHelper $tableHelper
 	 */
 	public function __construct(
 		EntityTypeRepositoryInterface $entityTypeRepository,
 		EntityTypeBundleInfoInterface $entityTypeBundle,
-		CommandHelper $commandHelper,
 		TableHelper $tableHelper
 	) {
 		$this->entityTypeRepository = $entityTypeRepository;
 		$this->entityTypeBundle = $entityTypeBundle;
-		$this->commandHelper = $commandHelper;
 		$this->outputTable = $tableHelper;
 		parent::__construct();
 	}
@@ -68,12 +61,6 @@ class EntityCommand extends DrushCommands
 	 */
 	public function entity($paramEntityGroup = null)
 	{
-		$commandDescription = $this->commandHelper->getCommandDescription(
-			$this->commandData->annotationData()->get('command')
-		);
-
-		$this->io()->text($commandDescription);
-
 		$this->outputTable->addHeaderRow([
 			$this->t('Entity class ID'),
 			$this->t('Entity ID'),
@@ -125,5 +112,16 @@ class EntityCommand extends DrushCommands
 			$this->outputTable->getHeaderRows(),
 			$this->outputTable->getRows()
 		);
+	}
+
+	/**
+	 * @hook pre-command debug:entity
+	 */
+	public function preCommand(CommandData $commandData)
+	{
+		$commandHelper = new CommandHelper($commandData);
+		$commandDescription = $commandHelper->getCommandDescription();
+
+		$this->io()->text($commandDescription);
 	}
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\drush_extra\Commands\Debug;
 
+use Consolidation\AnnotatedCommand\CommandData;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\drush_extra\Helpers\CommandHelper;
@@ -21,11 +22,6 @@ class ImageStylesCommand extends DrushCommands
 	protected $entityTypeManager;
 
 	/**
-	 * @var CommandHelper
-	 */
-	protected $commandHelper;
-
-	/**
 	 * @var TableHelper
 	 */
 	protected $tableHelper;
@@ -34,16 +30,13 @@ class ImageStylesCommand extends DrushCommands
 	 * ImageStylesCommand constructor.
 	 *
 	 * @param EntityTypeManagerInterface $entityTypeManager
-	 * @param CommandHelper $commandHelper
 	 * @param TableHelper $tableHelper
 	 */
 	public function __construct(
 		EntityTypeManagerInterface $entityTypeManager,
-		CommandHelper $commandHelper,
 		TableHelper $tableHelper
 	) {
 		$this->entityTypeManager = $entityTypeManager;
-		$this->commandHelper = $commandHelper;
 		$this->outputTable = $tableHelper;
 		parent::__construct();
 	}
@@ -58,12 +51,6 @@ class ImageStylesCommand extends DrushCommands
 	 */
 	public function styles()
 	{
-		$commandDescription = $this->commandHelper->getCommandDescription(
-			$this->commandData->annotationData()->get('command')
-		);
-
-		$this->io()->text($commandDescription);
-
 		$imageStyles = $this->entityTypeManager->getStorage('image_style')->loadMultiple();
 		$this->imageStylesList($imageStyles);
 	}
@@ -129,5 +116,16 @@ class ImageStylesCommand extends DrushCommands
 
 			$this->outputTable->addEmptyRow();
 		}
+	}
+
+	/**
+	 * @hook pre-command debug:image:styles
+	 */
+	public function preCommand(CommandData $commandData)
+	{
+		$commandHelper = new CommandHelper($commandData);
+		$commandDescription = $commandHelper->getCommandDescription();
+
+		$this->io()->text($commandDescription);
 	}
 }
